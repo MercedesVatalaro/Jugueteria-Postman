@@ -4,6 +4,7 @@ require_once "./Controller/APIController.php";
 
 
 
+
 class ProductApiController extends APIController
 {
     public function __construct()
@@ -121,7 +122,10 @@ class ProductApiController extends APIController
     function createProduct($params = null)
     {
         $data = $this->getData();
-
+       if(!$this->AuthHelper->isLoggedIn()){
+        $this->view->response("No  estas logueado", 401);
+        return;
+       }
         if (empty($data->nombre) || empty($data->descripcion) || empty($data->precio) || empty($data->id_categoria)) {
             $this->view->response("Complete los datos", 400);
         } else {
@@ -137,6 +141,10 @@ class ProductApiController extends APIController
 
     function updateProduct($params = null)
     {
+        if(!$this->AuthHelper->isLoggedIn()){
+            $this->view->response("No  estas logueado", 401);
+            return;
+           }
         $id = $params[':ID'];
         $data = $this->getData();
         if (empty($data->nombre) || empty($data->descripcion) || empty($data->precio) || empty($data->id_categoria)) {
