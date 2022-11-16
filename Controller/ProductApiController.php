@@ -11,6 +11,7 @@ class ProductApiController extends APIController
     {
         parent::__construct();
         $this->model = new ProductModel();
+        $this->AuthHelper = new AuthApiHelper();
     }
 
 
@@ -24,7 +25,7 @@ class ProductApiController extends APIController
         $offer = '';
 
         if (
-            key_exists('sort', $_GET) 
+            key_exists('sort', $_GET)
         ) {
             $sort = $_GET['sort'];
 
@@ -38,7 +39,7 @@ class ProductApiController extends APIController
             } else {
                 $sort = 'ORDER BY  id';
             }
-        } 
+        }
 
 
         if (key_exists('column', $_GET)) {
@@ -50,29 +51,27 @@ class ProductApiController extends APIController
 
             $offer = $_GET['offer'] ?? '*';
         }
-        
-        try{
-        if ($sort ) {
 
-            $products = $this->model->getProductsOrder($sort);
-            $this->view->response($products, 200);
+        try {
+            if ($sort) {
 
-        } else if ($column)  {
+                $products = $this->model->getProductsOrder($sort);
+                $this->view->response($products, 200);
+            } else if ($column) {
 
-            $products = $this->model->getProductsFilter($column);
-            $this->view->response($products, 200);
+                $products = $this->model->getProductsFilter($column);
+                $this->view->response($products, 200);
+            } else if ($offer) {
 
-        } else if ($offer) {
+                $products = $this->model->getProductsOffer($offer);
+                $this->view->response($products, 200);
+            }
+        } catch (PDOException $Exception) {
 
-            $products = $this->model->getProductsOffer($offer);
-            $this->view->response($products, 200);
+            return $this->view->response("Verifique las opciones ingresadas", 404);
         }
-    } catch (PDOException $Exception) {
 
-        return $this->view->response("Verifique las opciones ingresadas", 404);
-    }
-  
-    
+
 
         /*******************************************************************************************************
         Paginación y limite
@@ -83,15 +82,15 @@ class ProductApiController extends APIController
         if (key_exists('startAt', $_GET) && key_exists('endAt', $_GET)) {
             $startAt = $_GET['startAt'];
             $endAt = $_GET['endAt'];
-            $cant= 4;
+            $cant = 4;
             $endAt = ($startAt - 1) * $cant;
         }
-      
+
         if (($startAt) && ($endAt)) {
             $products = $this->model->getProductsLimit($startAt, $endAt);
             $this->view->response($products, 200);
         }
-   
+
 
         if (!isset($_GET['sort']) && !isset($_GET['order']) && !isset($_GET['column']) && !isset($_GET['offer']) && !isset($_GET['startAt']) && !isset($_GET['endAt'])) {
 
@@ -121,11 +120,12 @@ class ProductApiController extends APIController
 
     function createProduct($params = null)
     {
+        if (!$this->AuthHelper->isLoggedIn()) {
+            $this->view->response("No  estas logueado", 401);
+            return;
+        }
         $data = $this->getData();
-       if(!$this->AuthHelper->isLoggedIn()){
-        $this->view->response("No  estas logueado", 401);
-        return;
-       }
+
         if (empty($data->nombre) || empty($data->descripcion) || empty($data->precio) || empty($data->id_categoria)) {
             $this->view->response("Complete los datos", 400);
         } else {
@@ -141,11 +141,12 @@ class ProductApiController extends APIController
 
     function updateProduct($params = null)
     {
-        if(!$this->AuthHelper->isLoggedIn()){
+        $id = $params[':ID'];
+        if (!$this->AuthHelper->isLoggedIn()) {
             $this->view->response("No  estas logueado", 401);
             return;
-           }
-        $id = $params[':ID'];
+        }
+
         $data = $this->getData();
         if (empty($data->nombre) || empty($data->descripcion) || empty($data->precio) || empty($data->id_categoria)) {
             $this->view->response("Complete los datos", 400);
@@ -158,6 +159,10 @@ class ProductApiController extends APIController
     function deleteProduct($params = null)
     {
         $id = $params[":ID"];
+        if (!$this->AuthHelper->isLoggedIn()) {
+            $this->view->response("No  estas logueado", 401);
+            return;
+        }
         $product = $this->model->getProduct($id);
 
         if ($product) {

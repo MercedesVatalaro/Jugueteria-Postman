@@ -125,6 +125,7 @@ Hace referencia al nombre e id de los productos que tienen esa oferta.
 “ofertas”: “Especial navidad”
 }
 ]
+
 GET:
 /users/token
 Al utilizar en postman la autenticacion Basic Auth, se ingresan lo datos de usuario almacenados en la base de datos y genera un token, que es utilizado para autenticar a traves de bearer token, en los metodos HTTP, Post, Put y Delete.  
