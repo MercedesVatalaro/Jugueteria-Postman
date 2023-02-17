@@ -1,4 +1,4 @@
-# TP_Especial_Parte_2
+# Jugueteria- Postman
 Introducción
 La API REST permite a los clientes acceder gran parte de los recursos. Esta API tiene predicción de URL, orientada a recursos y utiliza códigos de respuesta HTTP para indicar errores de API. Utiliza funciones HTTP integradas, como la autenticación HTTP y los HTTP verbs, que son entendidos por los clientes HTTP disponibles en el mercado. Todas las respuestas de la API son devueltas en JSON, incluidos los errores.
 
